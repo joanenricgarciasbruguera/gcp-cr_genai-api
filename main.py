@@ -1,10 +1,30 @@
 from fastapi import FastAPI
+from google.cloud import storage
+import json
+import datetime
 
-# Create a FastAPI instance
 app = FastAPI()
 
-# Define a GET endpoint at the root URL
+# Initialize the Google Cloud Storage client
+storage_client = storage.Client()
+bucket_name = "genai-content"
+bucket = storage_client.bucket(bucket_name)
+
+
 @app.get("/")
 async def read_root():
-    # Return a JSON response with the message "Hello World"
-    return {"message": "Hello World"}
+    # The JSON response you want to return and store
+    response_json = {"message": "Hello World"}
+
+    # Convert the JSON data to a string and then encode to bytes
+    json_bytes = json.dumps(response_json).encode('utf-8')
+
+    # Generate a unique blob name using the current UTC timestamp
+    blob_name = f"hello_{datetime.datetime.utcnow().isoformat()}.json"
+    blob = bucket.blob(blob_name)
+
+    # Upload the JSON data to the bucket
+    blob.upload_from_string(json_bytes, content_type="application/json")
+
+    # Return the JSON response to the client
+    return response_json
