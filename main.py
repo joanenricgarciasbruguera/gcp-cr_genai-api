@@ -2,12 +2,18 @@ from fastapi import FastAPI
 from google.cloud import storage
 import json
 import datetime
+import sys
+import os
 
 app = FastAPI()
 
+if not sys.platform.startswith("linux"):
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/joanenricgarcias/Repositories/gcp-cr_genai-api/skiller-sandbox-ai-b7987e8977bc.json"
+
+
 # Initialize the Google Cloud Storage client
 storage_client = storage.Client()
-bucket_name = "genai-content"
+bucket_name = "genai-api"
 bucket = storage_client.bucket(bucket_name)
 
 
